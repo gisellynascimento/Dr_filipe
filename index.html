@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dr. Filipe | Quiropraxia & Liberação Miofascial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            dark: '#0F172A',
+                            teal: '#0D9488',
+                            tealHover: '#0F766E',
+                            accent: '#F59E0B',
+                            lightBg: '#F8FAFC'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        html { scroll-behavior: smooth; }
+    </style>
+</head>
+<body class="bg-brand-lightBg text-slate-800 font-sans antialiased">
+
+    <!-- NAVBAR -->
+    <header class="fixed top-0 left-0 right-0 bg-brand-dark/95 backdrop-blur-md text-white z-50 shadow-md">
+        <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+            <a href="#" class="flex items-center gap-2">
+                <i class="fa-solid fa-hands-holding text-brand-teal text-2xl"></i>
+                <div>
+                    <span class="text-lg font-bold block leading-tight">Dr. Filipe</span>
+                    <span class="text-xs text-teal-400 font-medium">Quiropraxia & Liberação</span>
+                </div>
+            </a>
+            <nav class="hidden md:flex gap-6 text-sm font-medium">
+                <a href="#sobre" class="hover:text-brand-teal transition">Sobre</a>
+                <a href="#servicos" class="hover:text-brand-teal transition">Especialidades</a>
+                <a href="#depoimentos" class="hover:text-brand-teal transition">Depoimentos</a>
+                <a href="#agendar" class="bg-brand-teal hover:bg-brand-tealHover px-4 py-2 rounded-full font-semibold transition">Agendar Consulta</a>
+            </nav>
+            <a href="#agendar" class="md:hidden bg-brand-teal text-xs font-bold px-3 py-2 rounded-lg">Agendar</a>
+        </div>
+    </header>
+
+    <!-- HERO SECTION -->
+    <section class="pt-28 pb-16 bg-gradient-to-b from-brand-dark to-slate-900 text-white px-4">
+        <div class="max-w-4xl mx-auto text-center space-y-6">
+            <span class="inline-block bg-teal-500/20 text-brand-teal text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                Atendimento Especializado
+            </span>
+            <h1 class="text-3xl md:text-5xl font-extrabold leading-tight">
+                Viva sem dores e recupere sua qualidade de vida
+            </h1>
+            <p class="text-slate-300 text-base md:text-lg max-w-2xl mx-auto">
+                Tratamentos personalizados de Quiropraxia e Liberação Miofascial para aliviar dores na coluna, torcicolos e tensões musculares crônicas.
+            </p>
+            <div class="flex flex-col sm:flex-row justify-center gap-4 pt-4">
+                <a href="#agendar" class="bg-brand-teal hover:bg-brand-tealHover text-white font-bold px-8 py-3.5 rounded-xl shadow-lg transition flex items-center justify-center gap-2">
+                    <i class="fa-regular fa-calendar-check"></i> Agendar Primeira Consulta
+                </a>
+                <a href="https://wa.me/5500000000000" target="_blank" class="bg-slate-800 hover:bg-slate-700 text-white font-bold px-6 py-3.5 rounded-xl border border-slate-700 transition flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-emerald-400"></i> Falar no WhatsApp
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ESPECIALIDADES -->
+    <section id="servicos" class="py-16 px-4 max-w-6xl mx-auto">
+        <div class="text-center mb-12">
+            <h2 class="text-2xl md:text-3xl font-bold text-brand-dark">Especialidades & Tratamentos</h2>
+            <p class="text-slate-600 mt-2">Técnicas focadas na causa da dor, não apenas nos sintomas.</p>
+        </div>
+
+        <div class="grid md:grid-cols-3 gap-6">
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition">
+                <div class="w-12 h-12 bg-teal-100 text-brand-teal rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                    <i class="fa-solid fa-bone"></i>
+                </div>
+                <h3 class="text-xl font-bold text-brand-dark mb-2">Quiropraxia Clínica</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Ajustes articulares e vertebrais precisos para alinhar a coluna, destravar articulações e aliviar a pressão nervosa.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition">
+                <div class="w-12 h-12 bg-teal-100 text-brand-teal rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                    <i class="fa-solid fa-spa"></i>
+                </div>
+                <h3 class="text-xl font-bold text-brand-dark mb-2">Liberação Miofascial</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Técnica manual direcionada aos tecidos musculares para eliminar "nós" de tensão, contraturas e restaurar a flexibilidade.</p>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200/80 hover:shadow-md transition">
+                <div class="w-12 h-12 bg-teal-100 text-brand-teal rounded-xl flex items-center justify-center text-xl font-bold mb-4">
+                    <i class="fa-solid fa-child-reaching"></i>
+                </div>
+                <h3 class="text-xl font-bold text-brand-dark mb-2">Reabilitação Postural</h3>
+                <p class="text-slate-600 text-sm leading-relaxed">Tratamento focado em quem passa longas horas sentado ou possui dores recorrentes na lombar, cervical e ombros.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FORMULÁRIO DE AGENDAMENTO -->
+    <section id="agendar" class="py-16 px-4 bg-slate-900 text-white">
+        <div class="max-w-xl mx-auto bg-slate-800 p-6 md:p-8 rounded-3xl border border-slate-700 shadow-2xl">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold">Agende sua Consulta</h2>
+                <p class="text-slate-400 text-sm mt-1">Preencha os dados abaixo. No 1º agendamento, crie sua senha de acesso.</p>
+            </div>
+
+            <form id="formAgendamento" onsubmit="enviarAgendamento(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Nome Completo *</label>
+                    <input type="text" id="nome" required placeholder="Digite seu nome completo" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:border-brand-teal focus:outline-none">
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">WhatsApp *</label>
+                        <input type="tel" id="whatsapp" required placeholder="(00) 90000-0000" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:border-brand-teal focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Crie uma Senha *</label>
+                        <input type="password" id="senha" required placeholder="Sua senha secreta" class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:border-brand-teal focus:outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Tratamento Desejado *</label>
+                    <select id="servico" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:border-brand-teal focus:outline-none">
+                        <option value="Quiropraxia">Quiropraxia Clínica</option>
+                        <option value="Liberação Miofascial">Liberação Miofascial</option>
+                        <option value="Combo: Quiropraxia + Liberação">Combo: Quiropraxia + Liberação Miofascial</option>
+                        <option value="Avaliação de Coluna">Avaliação e Alinhamento</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Data *</label>
+                        <input type="date" id="data" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:border-brand-teal focus:outline-none text-slate-300">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold uppercase text-slate-300 mb-1">Horário *</label>
+                        <select id="horario" required class="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm focus:border-brand-teal focus:outline-none">
+                            <option value="08:00">08:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="18:00">18:00</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full bg-brand-teal hover:bg-brand-tealHover font-bold py-3.5 rounded-xl shadow-lg transition mt-4 flex items-center justify-center gap-2">
+                    <i class="fa-brands fa-whatsapp text-lg"></i> Confirmar Agendamento no WhatsApp
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="bg-brand-dark text-slate-400 py-8 px-4 text-center text-xs border-t border-slate-800">
+        <p>© Dr. Filipe - Quiropraxia & Liberação Miofascial. Todos os direitos reservados.</p>
+    </footer>
+
+    <script>
+        function enviarAgendamento(e) {
+            e.preventDefault();
+            const nome = document.getElementById('nome').value;
+            const whatsapp = document.getElementById('whatsapp').value;
+            const servico = document.getElementById('servico').value;
+            const data = document.getElementById('data').value;
+            const horario = document.getElementById('horario').value;
+
+            // Salva cadastro localmente
+            const usuario = { nome, whatsapp };
+            localStorage.setItem('drfilipe_paciente', JSON.stringify(usuario));
+
+            // Mensagem formatada para o WhatsApp do Dr. Filipe
+            const numeroDr = "5500000000000"; // Substituir pelo número real do Dr. Filipe
+            const mensagem = `Olá, Dr. Filipe! Fiz meu agendamento pelo site:%0A%0A` +
+                `*Nome:* ${nome}%0A` +
+                `*Serviço:* ${servico}%0A` +
+                `*Data:* ${data}%0A` +
+                `*Horário:* ${horario}%0A%0A` +
+                `Aguardo confirmação!`;
+
+            window.open(`https://wa.me/${numeroDr}?text=${mensagem}`, '_blank');
+        }
+    </script>
+</body>
+</html>
