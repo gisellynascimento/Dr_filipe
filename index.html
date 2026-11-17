@@ -666,6 +666,9 @@
       const senhaPura = document.getElementById('admin-senha').value;
       
       if (senhaPura === 'chai2026') {
+        // Limpa a senha do campo imediatamente após o login
+        document.getElementById('admin-senha').value = '';
+        
         document.getElementById('user-welcome').innerText = 'Dr. Filipe';
         document.getElementById('header-actions').classList.remove('hidden');
         carregarDadosAdmin();
