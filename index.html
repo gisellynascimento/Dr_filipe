@@ -111,10 +111,10 @@
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp</label>
-          <input type="text" id="cad-whatsapp" required placeholder="(22) 99999-9999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="text" id="cad-whatsapp" required maxlength="15" placeholder="(22) 99999-9999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Crie uma Senha</label>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Crie uma Senha (Mín. 6 caracteres)</label>
           <input type="password" id="cad-senha" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Cadastrar Conta</button>
@@ -143,7 +143,7 @@
           <input type="text" id="red-whatsapp" placeholder="(22) 99999-9999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nova Senha</label>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nova Senha (Mín. 6 caracteres)</label>
           <input type="password" id="red-novasenha" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Redefinir Senha</button>
@@ -308,11 +308,11 @@
 
   <!-- SCRIPT DE INTEGRAÇÃO SUPABASE -->
   <script>
-    // 👇 CHAVES DO SUPABASE JÁ CONFIGURADAS:
+    // Configuração do Supabase
     const SUPABASE_URL = 'https://oqdjolcdmjzucwknvivg.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_D9D3I0Z1U0V1W2X3Y4Z5A6B7C8D9E0F1'; // Insira aqui sua chave completa caso necessário
+    const SUPABASE_ANON_KEY = 'sb_publishable_D9D3I0Z1U0V1W2X3Y4Z5A6B7C8D9E0F1';
 
-    const supabaseClient = supabase.createClient(SUPABASE_URL, 'sb_publishable_D9D3I0Z1U0V1W2X3Y4Z5A6B7C8D9E0F1'); // Cole a chave completa exata se preferir
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
@@ -403,13 +403,26 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // --- CLIENTE: CADASTRO E LOGIN ---
+    // --- CLIENTE: CADASTRO E LOGIN (Com Validações) ---
     async function tratarCadastroCliente(e) {
       e.preventDefault();
-      const nome = document.getElementById('cad-nome').value;
-      const whatsapp = document.getElementById('cad-whatsapp').value;
+      const nome = document.getElementById('cad-nome').value.trim();
+      const whatsapp = document.getElementById('cad-whatsapp').value.trim();
       const senhaPura = document.getElementById('cad-senha').value;
       
+      // Validação de tamanho mínimo da senha
+      if (senhaPura.length < 6) {
+        alert('A senha precisa ter pelo menos 6 caracteres.');
+        return;
+      }
+
+      // Validação de tamanho do WhatsApp
+      const apenasNumeros = whatsapp.replace(/\D/g, '');
+      if (apenasNumeros.length < 10 || apenasNumeros.length > 11) {
+        alert('Por favor, digite um número de WhatsApp válido com DDD (ex: 22999999999).');
+        return;
+      }
+
       mostrarLoader(true);
       const senhaHash = await calcularHash(senhaPura);
 
@@ -463,6 +476,11 @@
       e.preventDefault();
       const whatsapp = document.getElementById('red-whatsapp').value;
       const novaSenhaPura = document.getElementById('red-novasenha').value;
+
+      if (novaSenhaPura.length < 6) {
+        alert('A nova senha precisa ter pelo menos 6 caracteres.');
+        return;
+      }
 
       mostrarLoader(true);
       const novaSenhaHash = await calcularHash(novaSenhaPura);
@@ -610,7 +628,6 @@
       const tbody = document.getElementById('tabela-agendamentos-admin');
       tbody.innerHTML = '';
       if (agendamentos && agendamentos.length > 0) {
-        agendamentos.handlers = true; // prevent warnings
         agendamentos.forEach(ag => {
           tbody.innerHTML += `
             <tr class="hover:bg-slate-50 transition">
