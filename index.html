@@ -113,8 +113,8 @@
           <input type="text" id="cad-nome" required autocomplete="off" placeholder="Seu nome" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp (Apenas números com DDD)</label>
-          <input type="text" id="cad-whatsapp" required autocomplete="off" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp (Ex: (21) 99808-3250)</label>
+          <input type="text" id="cad-whatsapp" required autocomplete="off" placeholder="(21) 99808-3250" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Crie uma Senha (Mín. 6 caracteres)</label>
@@ -126,8 +126,8 @@
       <!-- Formulário de Login -->
       <form id="form-login-cliente" autocomplete="off" onsubmit="tratarLoginCliente(event)" class="space-y-4 hidden">
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp (Apenas números)</label>
-          <input type="text" id="login-whatsapp" autocomplete="off" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp (Ex: (21) 99808-3250)</label>
+          <input type="text" id="login-whatsapp" autocomplete="off" placeholder="(21) 99808-3250" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Senha</label>
@@ -142,8 +142,8 @@
       <!-- Formulário de Redefinir Senha -->
       <form id="form-redefinir-senha" autocomplete="off" onsubmit="tratarRedefinirSenha(event)" class="space-y-4 hidden">
         <div>
-          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Seu WhatsApp (Apenas números)</label>
-          <input type="text" id="red-whatsapp" autocomplete="off" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Seu WhatsApp (Ex: (21) 99808-3250)</label>
+          <input type="text" id="red-whatsapp" autocomplete="off" placeholder="(21) 99808-3250" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nova Senha (Mín. 6 caracteres)</label>
@@ -441,7 +441,8 @@
     async function tratarCadastroCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('cad-nome').value.trim();
-      const whatsapp = document.getElementById('cad-whatsapp').value.trim();
+      const whatsappBruto = document.getElementById('cad-whatsapp').value;
+      const whatsapp = whatsappBruto.replace(/\D/g, ''); // Limpa os parênteses e traços para salvar puro no banco
       const senhaPura = document.getElementById('cad-senha').value;
       
       if (senhaPura.length < 6) {
@@ -450,7 +451,7 @@
       }
 
       if (whatsapp.length < 10 || whatsapp.length > 11) {
-        mostrarMensagem('O WhatsApp deve conter 10 ou 11 dígitos (DDD + Número).', 'erro');
+        mostrarMensagem('O WhatsApp deve conter DDD + Número (10 ou 11 dígitos).', 'erro');
         return;
       }
 
@@ -477,11 +478,12 @@
 
     async function tratarLoginCliente(e) {
       e.preventDefault();
-      const whatsapp = document.getElementById('login-whatsapp').value.trim();
+      const whatsappBruto = document.getElementById('login-whatsapp').value;
+      const whatsapp = whatsappBruto.replace(/\D/g, ''); // Limpa formatação para buscar no banco
       const senhaPura = document.getElementById('login-senha').value;
 
       if (whatsapp.length < 10 || whatsapp.length > 11) {
-        mostrarMensagem('Digite um WhatsApp válido com 10 ou 11 dígitos.', 'erro');
+        mostrarMensagem('Digite um WhatsApp válido com DDD.', 'erro');
         return;
       }
 
@@ -511,11 +513,12 @@
 
     async function tratarRedefinirSenha(e) {
       e.preventDefault();
-      const whatsapp = document.getElementById('red-whatsapp').value.trim();
+      const whatsappBruto = document.getElementById('red-whatsapp').value;
+      const whatsapp = whatsappBruto.replace(/\D/g, '');
       const novaSenhaPura = document.getElementById('red-novasenha').value;
 
       if (whatsapp.length < 10 || whatsapp.length > 11) {
-        mostrarMensagem('Digite um WhatsApp válido com 10 ou 11 dígitos.', 'erro');
+        mostrarMensagem('Digite um WhatsApp válido com DDD.', 'erro');
         return;
       }
 
