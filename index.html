@@ -311,9 +311,9 @@
 
   <!-- SCRIPT DE INTEGRAÇÃO SUPABASE -->
   <script>
-    // Configuração do Supabase
+    // Configuração com a sua Chave Real do Supabase
     const SUPABASE_URL = 'https://oqdjolcdmjzucwknvivg.supabase.co';
-    const SUPABASE_ANON_KEY = 'sb_publishable_D9D3I0Z1U0V1W2X3Y4Z5A6B7C8D9E0F1';
+    const SUPABASE_ANON_KEY = 'sb_publishable_D9D3I68g4lwcWipW0OLPJQ_ZSI9Hyn9';
 
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -433,7 +433,7 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // --- CLIENTE: CADASTRO E LOGIN (Com Validação Estrita de WhatsApp) ---
+    // --- CLIENTE: CADASTRO E LOGIN ---
     async function tratarCadastroCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('cad-nome').value.trim();
