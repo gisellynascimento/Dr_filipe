@@ -1,0 +1,674 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dr. Filipe - Quiropraxia & Saúde</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- Supabase JS Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: { sans: ['Inter', 'sans-serif'] },
+          colors: {
+            brand: { 50: '#eff6ff', 100: '#dbeafe', 500: '#3b82f6', 600: '#2563eb', 700: '#1d4ed8' }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+
+  <!-- HEADER -->
+  <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
+    <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="voltarInicio()">
+        <div class="bg-brand-600 text-white p-2.5 rounded-xl shadow-md">
+          <i data-lucide="activity" class="w-6 h-6"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-slate-900 tracking-tight">Dr. Filipe</h1>
+          <p class="text-xs text-slate-500 font-medium">Especialista em Quiropraxia</p>
+        </div>
+      </div>
+      <div id="header-actions" class="hidden flex items-center space-x-3">
+        <span id="user-welcome" class="text-sm font-medium text-slate-600 hidden sm:inline"></span>
+        <button onclick="fazerLogout()" class="flex items-center space-x-1 text-xs bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 px-3 py-2 rounded-lg transition font-medium">
+          <i data-lucide="log-out" class="w-4 h-4"></i>
+          <span>Sair</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="max-w-5xl mx-auto px-4 py-8 w-full flex-grow">
+
+    <!-- LOADER GLOBAL -->
+    <div id="loader" class="hidden flex flex-col items-center justify-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mb-4"></div>
+      <p class="text-slate-500 text-sm font-medium">Carregando informações...</p>
+    </div>
+
+    <!-- TELA 1: ESCOLHA DE PERFIL (INÍCIO) -->
+    <div id="view-inicio" class="max-w-md mx-auto space-y-6">
+      <div class="text-center space-y-2">
+        <h2 class="text-2xl font-bold tracking-tight text-slate-900">Bem-vindo ao Portal</h2>
+        <p class="text-sm text-slate-500">Escolha como deseja acessar o sistema de agendamentos e prontuários.</p>
+      </div>
+
+      <div class="grid gap-4">
+        <button onclick="mostrarTela('view-login-cliente')" class="group p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-brand-500 hover:shadow-md transition text-left flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="bg-brand-50 text-brand-600 p-3 rounded-xl group-hover:bg-brand-600 group-hover:text-white transition">
+              <i data-lucide="user" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-slate-900">Área do Paciente</h3>
+              <p class="text-xs text-slate-500">Agende consultas e consulte seus prontuários</p>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-brand-600 transition"></i>
+        </button>
+
+        <button onclick="mostrarTela('view-login-admin')" class="group p-5 bg-white border border-slate-200 rounded-2xl shadow-sm hover:border-slate-800 hover:shadow-md transition text-left flex items-center justify-between">
+          <div class="flex items-center space-x-4">
+            <div class="bg-slate-100 text-slate-700 p-3 rounded-xl group-hover:bg-slate-900 group-hover:text-white transition">
+              <i data-lucide="shield-check" class="w-6 h-6"></i>
+            </div>
+            <div>
+              <h3 class="font-semibold text-slate-900">Acesso Dr. Filipe</h3>
+              <p class="text-xs text-slate-500">Painel administrativo e gestão de pacientes</p>
+            </div>
+          </div>
+          <i data-lucide="chevron-right" class="w-5 h-5 text-slate-400 group-hover:text-slate-900 transition"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- TELA 2: CADASTRO / LOGIN CLIENTE -->
+    <div id="view-login-cliente" class="hidden max-w-md mx-auto bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="voltarInicio()" class="text-xs text-slate-500 hover:text-slate-800 flex items-center space-x-1 font-medium">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> <span>Voltar</span>
+        </button>
+        <div id="auth-mode-title" class="text-sm font-semibold text-brand-600">Criar Nova Conta</div>
+      </div>
+
+      <!-- Formulário de Cadastro -->
+      <form id="form-cadastro-cliente" onsubmit="tratarCadastroCliente(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nome Completo</label>
+          <input type="text" id="cad-nome" required placeholder="Seu nome" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp</label>
+          <input type="text" id="cad-whatsapp" required placeholder="(22) 99999-9999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Crie uma Senha</label>
+          <input type="password" id="cad-senha" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Cadastrar Conta</button>
+      </form>
+
+      <!-- Formulário de Login -->
+      <form id="form-login-cliente" onsubmit="tratarLoginCliente(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp</label>
+          <input type="text" id="login-whatsapp" placeholder="(22) 99999-9999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Senha</label>
+          <input type="password" id="login-senha" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Entrar no Portal</button>
+        <div class="text-right">
+          <button type="button" onclick="mudarParaRedefinir()" class="text-xs text-slate-500 hover:text-brand-600 font-medium">Esqueceu a senha?</button>
+        </div>
+      </form>
+
+      <!-- Formulário de Redefinir Senha -->
+      <form id="form-redefinir-senha" onsubmit="tratarRedefinirSenha(event)" class="space-y-4 hidden">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Seu WhatsApp</label>
+          <input type="text" id="red-whatsapp" placeholder="(22) 99999-9999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nova Senha</label>
+          <input type="password" id="red-novasenha" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+        </div>
+        <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Redefinir Senha</button>
+      </form>
+
+      <!-- Botões de Alternância -->
+      <div class="text-center pt-2 border-t border-slate-100 space-y-2">
+        <button type="button" id="btn-toggle-cadastro" class="text-xs text-brand-600 hover:underline font-medium hidden">Já tem cadastro? Clique aqui para entrar</button>
+        <button type="button" id="btn-toggle-login" class="text-xs text-brand-600 hover:underline font-medium block mx-auto">Já tem cadastro? Clique aqui para entrar</button>
+      </div>
+    </div>
+
+    <!-- TELA 3: PAINEL DO PACIENTE -->
+    <div id="view-painel-cliente" class="hidden space-y-6">
+      <div class="bg-gradient-to-r from-brand-600 to-brand-700 text-white p-6 sm:p-8 rounded-2xl shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest bg-brand-500/50 px-2.5 py-1 rounded-md font-semibold">Paciente</span>
+          <h2 id="cliente-nome-display" class="text-2xl font-bold mt-2">Olá!</h2>
+          <p class="text-brand-100 text-sm">Gerencie seus agendamentos e acompanhe seu tratamento quiroprático.</p>
+        </div>
+        <div class="flex gap-2 w-full sm:w-auto">
+          <button onclick="mudarAbasCliente('agendar')" id="tab-btn-agendar" class="flex-1 sm:flex-none px-4 py-2 bg-white text-brand-700 rounded-xl font-semibold text-xs transition shadow-sm">Novo Agendamento</button>
+          <button onclick="mudarAbasCliente('historico')" id="tab-btn-historico" class="flex-1 sm:flex-none px-4 py-2 bg-brand-500/40 text-white hover:bg-brand-500/60 rounded-xl font-semibold text-xs transition">Meus Prontuários</button>
+        </div>
+      </div>
+
+      <!-- Seção Agendamento -->
+      <div id="cliente-secao-agendar" class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm max-w-2xl mx-auto">
+        <h3 class="text-lg font-bold text-slate-900 mb-4 flex items-center space-x-2">
+          <i data-lucide="calendar-plus" class="w-5 h-5 text-brand-600"></i>
+          <span>Agendar Consulta</span>
+        </h3>
+        <div id="aviso-agendamento-bloqueado" class="hidden p-4 bg-amber-50 border border-amber-200 text-amber-800 rounded-xl text-sm mb-4">
+          O agendamento online está temporariamente desativado pelo Dr. Filipe. Entre em contato via WhatsApp para marcar.
+        </div>
+        <form id="form-agendamento" onsubmit="tratarAgendamento(event)" class="space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Serviço Desejado</label>
+            <select id="ag-servico" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm">
+              <option value="Primeira Consulta / Avaliação de Quiropraxia">Primeira Consulta / Avaliação de Quiropraxia</option>
+              <option value="Sessão de Ajuste Quiroprático (Retorno)">Sessão de Ajuste Quiroprático (Retorno)</option>
+              <option value="Liberação Miofascial + Quiropraxia">Liberação Miofascial + Quiropraxia</option>
+            </select>
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Data da Consulta</label>
+              <input type="date" id="ag-data" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm">
+            </div>
+            <div>
+              <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Horário</label>
+              <select id="ag-horario" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 outline-none text-sm">
+                <option value="09:00">09:00</option>
+                <option value="10:00">10:00</option>
+                <option value="11:00">11:00</option>
+                <option value="14:00">14:00</option>
+                <option value="15:00">15:00</option>
+                <option value="16:00">16:00</option>
+                <option value="17:00">17:00</option>
+              </select>
+            </div>
+          </div>
+          <button type="submit" id="btn-enviar-agendamento" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Confirmar Agendamento</button>
+        </form>
+      </div>
+
+      <!-- Seção Histórico / Prontuários -->
+      <div id="cliente-secao-historico" class="hidden space-y-4">
+        <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+          <i data-lucide="file-text" class="w-5 h-5 text-brand-600"></i>
+          <span>Seus Registros e Evoluções</span>
+        </h3>
+        <div id="lista-historico-cliente" class="space-y-3"></div>
+      </div>
+    </div>
+
+    <!-- TELA 4: LOGIN ADMIN (DR. FILIPE) -->
+    <div id="view-login-admin" class="hidden max-w-md mx-auto bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm space-y-6">
+      <div class="flex items-center justify-between">
+        <button onclick="voltarInicio()" class="text-xs text-slate-500 hover:text-slate-800 flex items-center space-x-1 font-medium">
+          <i data-lucide="arrow-left" class="w-4 h-4"></i> <span>Voltar</span>
+        </button>
+        <span class="text-sm font-semibold text-slate-900">Painel Restrito</span>
+      </div>
+      <form onsubmit="tratarLoginAdmin(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Senha Mestre</label>
+          <input type="password" id="admin-senha" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 focus:bg-white outline-none text-sm transition">
+        </div>
+        <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-sm">Acessar Painel</button>
+      </form>
+    </div>
+
+    <!-- TELA 5: PAINEL ADMIN (DR. FILIPE) -->
+    <div id="view-painel-admin" class="hidden space-y-6">
+      <div class="bg-slate-900 text-white p-6 sm:p-8 rounded-2xl shadow-md flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <span class="text-xs uppercase tracking-widest bg-slate-800 px-2.5 py-1 rounded-md font-semibold text-slate-300">Administração</span>
+          <h2 class="text-2xl font-bold mt-2">Dr. Filipe - Gestão Clínica</h2>
+          <p class="text-slate-400 text-sm">Controle de agendamentos e prontuários dos pacientes.</p>
+        </div>
+        <div class="bg-slate-800 px-4 py-3 rounded-xl border border-slate-700 flex items-center justify-between gap-4 w-full sm:w-auto">
+          <span class="text-xs font-medium text-slate-300">Agendamento Online</span>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" id="toggle-liberar-agendamento" onchange="alterarConfigAgendamento(this)" class="sr-only peer">
+            <div class="w-11 h-6 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+          </label>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- Coluna Esquerda: Agendamentos -->
+        <div class="lg:col-span-2 space-y-4">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <i data-lucide="calendar" class="w-5 h-5 text-slate-700"></i>
+            <span>Consultas Agendadas</span>
+          </h3>
+          <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+              <thead>
+                <tr class="border-b border-slate-100 text-xs text-slate-400 uppercase">
+                  <th class="py-3 px-3">Data / Horário</th>
+                  <th class="py-3 px-3">Paciente</th>
+                  <th class="py-3 px-3">Serviço</th>
+                  <th class="py-3 px-3">WhatsApp</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-agendamentos-admin" class="divide-y divide-slate-100"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Coluna Direita: Prontuários / Novo Registro -->
+        <div class="space-y-4">
+          <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
+            <i data-lucide="folder-plus" class="w-5 h-5 text-slate-700"></i>
+            <span>Novo Prontuário</span>
+          </h3>
+          <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm space-y-4">
+            <form onsubmit="salvarProntuarioAdmin(event)" class="space-y-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Selecionar Paciente</label>
+                <select id="admin-paciente-whatsapp" required class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none text-sm"></select>
+              </div>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Anotações / Evolução</label>
+                <textarea id="admin-anotacao" rows="5" required placeholder="Descreva a avaliação quiroprática, ajustes realizados..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none text-sm resize-none"></textarea>
+              </div>
+              <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-sm">Salvar Prontuário</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
+    <p>Dr. Filipe Quiropraxia &bull; Todos os direitos reservados</p>
+  </footer>
+
+  <!-- SCRIPT DE INTEGRAÇÃO SUPABASE -->
+  <script>
+    // 👇 CHAVES DO SUPABASE JÁ CONFIGURADAS:
+    const SUPABASE_URL = 'https://oqdjolcdmjzucwknvivg.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_D9D3I0Z1U0V1W2X3Y4Z5A6B7C8D9E0F1'; // Insira aqui sua chave completa caso necessário
+
+    const supabaseClient = supabase.createClient(SUPABASE_URL, 'sb_publishable_D9D3I0Z1U0V1W2X3Y4Z5A6B7C8D9E0F1'); // Cole a chave completa exata se preferir
+
+    document.addEventListener('DOMContentLoaded', () => {
+      lucide.createIcons();
+      verificarConfiguracaoGlobal();
+      alternarModoAuth('cadastro');
+    });
+
+    let usuarioLogado = null;
+    let estadoAuth = 'cadastro';
+    const SENHA_ADMIN_HASH = "24c21966270df333eb7e31b67f10b7f6c38ee96f4094a9a016b8014e7a633190";
+
+    function mostrarTela(idTela) {
+      ['view-inicio', 'view-login-cliente', 'view-painel-cliente', 'view-login-admin', 'view-painel-admin'].forEach(id => {
+        document.getElementById(id).classList.add('hidden');
+      });
+      document.getElementById(idTela).classList.remove('hidden');
+      window.scrollTo(0, 0);
+    }
+
+    function voltarInicio() {
+      usuarioLogado = null;
+      document.getElementById('header-actions').classList.add('hidden');
+      mostrarTela('view-inicio');
+    }
+
+    function mostrarLoader(ativo) {
+      if (ativo) {
+        document.getElementById('loader').classList.remove('hidden');
+      } else {
+        document.getElementById('loader').classList.add('hidden');
+      }
+    }
+
+    function alternarModoAuth(modo) {
+      const formLogin = document.getElementById('form-login-cliente');
+      const formCad = document.getElementById('form-cadastro-cliente');
+      const formRed = document.getElementById('form-redefinir-senha');
+      const title = document.getElementById('auth-mode-title');
+      const btnLogin = document.getElementById('btn-toggle-login');
+      const btnCadastro = document.getElementById('btn-toggle-cadastro');
+
+      formLogin.classList.add('hidden');
+      formCad.classList.add('hidden');
+      formRed.classList.add('hidden');
+      btnLogin.classList.add('hidden');
+      btnCadastro.classList.add('hidden');
+
+      if (modo === 'cadastro') {
+        formCad.classList.remove('hidden');
+        btnLogin.classList.remove('hidden');
+        title.innerText = 'Criar Nova Conta';
+        btnLogin.innerText = 'Já tem cadastro? Clique aqui para entrar';
+        estadoAuth = 'cadastro';
+      } else if (modo === 'login') {
+        formLogin.classList.remove('hidden');
+        btnCadastro.classList.remove('hidden');
+        title.innerText = 'Entrar na Conta';
+        btnCadastro.innerText = 'Não tem cadastro? Clique aqui para criar';
+        estadoAuth = 'login';
+      }
+    }
+
+    function mudarParaRedefinir() {
+      document.getElementById('form-login-cliente').classList.add('hidden');
+      document.getElementById('form-redefinir-senha').classList.remove('hidden');
+      document.getElementById('auth-mode-title').innerText = 'Redefinir Senha';
+      document.getElementById('btn-toggle-login').classList.remove('hidden');
+      document.getElementById('btn-toggle-login').innerText = 'Lembrou a senha? Clique aqui para entrar';
+      estadoAuth = 'redefinir';
+    }
+
+    document.getElementById('btn-toggle-login').addEventListener('click', () => {
+      if (estadoAuth === 'login' || estadoAuth === 'redefinir') {
+        alternarModoAuth('cadastro');
+      } else {
+        alternarModoAuth('login');
+      }
+    });
+
+    document.getElementById('btn-toggle-cadastro').addEventListener('click', () => {
+      alternarModoAuth('login');
+    });
+
+    async function calcularHash(texto) {
+      const msgUint8 = new TextEncoder().encode(texto);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgUint8);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // --- CLIENTE: CADASTRO E LOGIN ---
+    async function tratarCadastroCliente(e) {
+      e.preventDefault();
+      const nome = document.getElementById('cad-nome').value;
+      const whatsapp = document.getElementById('cad-whatsapp').value;
+      const senhaPura = document.getElementById('cad-senha').value;
+      
+      mostrarLoader(true);
+      const senhaHash = await calcularHash(senhaPura);
+
+      const { data: existente } = await supabaseClient.from('clientes').select('*').eq('whatsapp', whatsapp).single();
+      if (existente) {
+        mostrarLoader(false);
+        alert('Este WhatsApp já está cadastrado. Vá em "Fazer Login".');
+        return;
+      }
+
+      const { error } = await supabaseClient.from('clientes').insert([{ nome, whatsapp, senha_hash: senhaHash }]);
+      mostrarLoader(false);
+
+      if (error) {
+        alert('Erro ao cadastrar. Tente novamente.');
+      } else {
+        alert('Cadastro realizado com sucesso! Faça login.');
+        alternarModoAuth('login');
+      }
+    }
+
+    async function tratarLoginCliente(e) {
+      e.preventDefault();
+      const whatsapp = document.getElementById('login-whatsapp').value;
+      const senhaPura = document.getElementById('login-senha').value;
+
+      mostrarLoader(true);
+      const senhaHash = await calcularHash(senhaPura);
+
+      const { data: cliente, error } = await supabaseClient.from('clientes').select('*').eq('whatsapp', whatsapp).single();
+      mostrarLoader(false);
+
+      if (error || !cliente) {
+        alert('WhatsApp não encontrado. Faça seu cadastro primeiro.');
+        return;
+      }
+
+      if (cliente.senha_hash === senhaHash) {
+        usuarioLogado = { nome: cliente.nome, whatsapp: cliente.whatsapp };
+        document.getElementById('cliente-nome-display').innerText = `Olá, ${cliente.nome}!`;
+        document.getElementById('user-welcome').innerText = cliente.nome;
+        document.getElementById('header-actions').classList.remove('hidden');
+        carregarDadosPainelCliente();
+        mostrarTela('view-painel-cliente');
+      } else {
+        alert('Senha incorreta. Verifique os dados informados.');
+      }
+    }
+
+    async function tratarRedefinirSenha(e) {
+      e.preventDefault();
+      const whatsapp = document.getElementById('red-whatsapp').value;
+      const novaSenhaPura = document.getElementById('red-novasenha').value;
+
+      mostrarLoader(true);
+      const novaSenhaHash = await calcularHash(novaSenhaPura);
+
+      const { data: cliente } = await supabaseClient.from('clientes').select('*').eq('whatsapp', whatsapp).single();
+      if (!cliente) {
+        mostrarLoader(false);
+        alert('Este WhatsApp não possui cadastro no sistema.');
+        return;
+      }
+
+      const { error } = await supabaseClient.from('clientes').update({ senha_hash: novaSenhaHash }).eq('whatsapp', whatsapp);
+      mostrarLoader(false);
+
+      if (error) {
+        alert('Erro ao redefinir senha.');
+      } else {
+        alert('Senha redefinida com sucesso! Faça login com a nova senha.');
+        alternarModoAuth('login');
+      }
+    }
+
+    function mudarAbasCliente(aba) {
+      const btnAgendar = document.getElementById('tab-btn-agendar');
+      const btnHistorico = document.getElementById('tab-btn-historico');
+      const secAgendar = document.getElementById('cliente-secao-agendar');
+      const secHistorico = document.getElementById('cliente-secao-historico');
+
+      if (aba === 'agendar') {
+        btnAgendar.className = "flex-1 sm:flex-none px-4 py-2 bg-white text-brand-700 rounded-xl font-semibold text-xs transition shadow-sm";
+        btnHistorico.className = "flex-1 sm:flex-none px-4 py-2 bg-brand-500/40 text-white hover:bg-brand-500/60 rounded-xl font-semibold text-xs transition";
+        secAgendar.classList.remove('hidden');
+        secHistorico.classList.add('hidden');
+      } else {
+        btnHistorico.className = "flex-1 sm:flex-none px-4 py-2 bg-white text-brand-700 rounded-xl font-semibold text-xs transition shadow-sm";
+        btnAgendar.className = "flex-1 sm:flex-none px-4 py-2 bg-brand-500/40 text-white hover:bg-brand-500/60 rounded-xl font-semibold text-xs transition";
+        secHistorico.classList.remove('hidden');
+        secAgendar.classList.add('hidden');
+        carregarHistoricoCliente();
+      }
+    }
+
+    async function verificarConfiguracaoGlobal() {
+      const { data } = await supabaseClient.from('configuracoes').select('*').eq('chave', 'liberarAgendamentoCliente').single();
+      const liberar = data ? (data.valor === 'true' || data.valor === true) : false;
+      
+      const aviso = document.getElementById('aviso-agendamento-bloqueado');
+      const btn = document.getElementById('btn-enviar-agendamento');
+      if (!liberar) {
+        aviso.classList.remove('hidden');
+        btn.disabled = true;
+        btn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        aviso.classList.add('hidden');
+        btn.disabled = false;
+        btn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+    }
+
+    function carregarDadosPainelCliente() {
+      verificarConfiguracaoGlobal();
+    }
+
+    async function tratarAgendamento(e) {
+      e.preventDefault();
+      const servico = document.getElementById('ag-servico').value;
+      const dataConsulta = document.getElementById('ag-data').value;
+      const horario = document.getElementById('ag-horario').value;
+
+      mostrarLoader(true);
+      const { error } = await supabaseClient.from('agendamentos').insert([{
+        nome: usuarioLogado.nome,
+        whatsapp: usuarioLogado.whatsapp,
+        servico,
+        data_consulta: dataConsulta,
+        horario
+      }]);
+      mostrarLoader(false);
+
+      if (error) {
+        alert('Erro ao realizar agendamento.');
+      } else {
+        alert('Consulta agendada com sucesso!');
+        document.getElementById('form-agendamento').reset();
+      }
+    }
+
+    async function carregarHistoricoCliente() {
+      mostrarLoader(true);
+      const { data: registros } = await supabaseClient.from('prontuarios').select('*').eq('whatsapp_paciente', usuarioLogado.whatsapp).order('data_hora', { ascending: false });
+      mostrarLoader(false);
+
+      const container = document.getElementById('lista-historico-cliente');
+      container.innerHTML = '';
+      if (registros && registros.length > 0) {
+        registros.forEach(item => {
+          const dataFormatada = new Date(item.data_hora).toLocaleDateString('pt-BR');
+          container.innerHTML += `
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
+              <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
+                <span>Data: ${dataFormatada}</span>
+                <span class="bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full">Atendimento Realizado</span>
+              </div>
+              <p class="text-sm text-slate-700 whitespace-pre-line">${item.anotacoes_dr}</p>
+            </div>
+          `;
+        });
+      } else {
+        container.innerHTML = `
+          <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400 text-sm">
+            Nenhum prontuário registrado até o momento.
+          </div>
+        `;
+      }
+    }
+
+    // --- ADMIN: LOGIN E PAINEL ---
+    async function tratarLoginAdmin(e) {
+      e.preventDefault();
+      const senhaPura = document.getElementById('admin-senha').value;
+      mostrarLoader(true);
+      const senhaHash = await calcularHash(senhaPura);
+      mostrarLoader(false);
+
+      if (senhaHash === SENHA_ADMIN_HASH) {
+        document.getElementById('user-welcome').innerText = 'Dr. Filipe';
+        document.getElementById('header-actions').classList.remove('hidden');
+        carregarDadosAdmin();
+        mostrarTela('view-painel-admin');
+      } else {
+        alert('Senha mestre incorreta!');
+      }
+    }
+
+    async function carregarDadosAdmin() {
+      mostrarLoader(true);
+      
+      // Config
+      const { data: configData } = await supabaseClient.from('configuracoes').select('*').eq('chave', 'liberarAgendamentoCliente').single();
+      const liberar = configData ? (configData.valor === 'true' || configData.valor === true) : false;
+      document.getElementById('toggle-liberar-agendamento').checked = liberar;
+
+      // Agendamentos
+      const { data: agendamentos } = await supabaseClient.from('agendamentos').select('*').order('id', { ascending: false });
+      const tbody = document.getElementById('tabela-agendamentos-admin');
+      tbody.innerHTML = '';
+      if (agendamentos && agendamentos.length > 0) {
+        agendamentos.handlers = true; // prevent warnings
+        agendamentos.forEach(ag => {
+          tbody.innerHTML += `
+            <tr class="hover:bg-slate-50 transition">
+              <td class="py-3 px-3 font-medium text-slate-900">${ag.data_consulta} às ${ag.horario}</td>
+              <td class="py-3 px-3 text-slate-700">${ag.nome}</td>
+              <td class="py-3 px-3 text-slate-600 text-xs">${ag.servico}</td>
+              <td class="py-3 px-3 text-slate-600">${ag.whatsapp}</td>
+            </tr>
+          `;
+        });
+      } else {
+        tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Nenhum agendamento encontrado.</td></tr>`;
+      }
+
+      // Pacientes
+      const { data: pacientes } = await supabaseClient.from('clientes').select('*').order('nome', { ascending: true });
+      const select = document.getElementById('admin-paciente-whatsapp');
+      select.innerHTML = '';
+      if (pacientes && pacientes.length > 0) {
+        pacientes.forEach(p => {
+          select.innerHTML += `<option value="${p.whatsapp}">${p.nome} (${p.whatsapp})</option>`;
+        });
+      } else {
+        select.innerHTML = `<option value="">Nenhum paciente cadastrado</option>`;
+      }
+
+      mostrarLoader(false);
+    }
+
+    async function alterarConfigAgendamento(checkbox) {
+      const liberar = String(checkbox.checked);
+      await supabaseClient.from('configuracoes').update({ valor: liberar }).eq('chave', 'liberarAgendamentoCliente');
+    }
+
+    async function salvarProntuarioAdmin(e) {
+      e.preventDefault();
+      const whatsappPaciente = document.getElementById('admin-paciente-whatsapp').value;
+      const anotacoesDr = document.getElementById('admin-anotacao').value;
+
+      mostrarLoader(true);
+      const { error } = await supabaseClient.from('prontuarios').insert([{
+        whatsapp_paciente: whatsappPaciente,
+        anotacoes_dr: anotacoesDr
+      }]);
+      mostrarLoader(false);
+
+      if (error) {
+        alert('Erro ao salvar prontuário.');
+      } else {
+        alert('Prontuário salvo com sucesso!');
+        document.getElementById('admin-anotacao').value = '';
+        carregarDadosAdmin();
+      }
+    }
+
+    function fazerLogout() {
+      voltarInicio();
+    }
+  </script>
+</body>
+</html>
