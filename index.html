@@ -106,32 +106,32 @@
         <div id="auth-mode-title" class="text-sm font-semibold text-brand-600">Criar Nova Conta</div>
       </div>
 
-      <!-- Formulário de Cadastro -->
-      <form id="form-cadastro-cliente" onsubmit="tratarCadastroCliente(event)" class="space-y-4">
+      <!-- Formulário de Cadastro (com autocomplete off) -->
+      <form id="form-cadastro-cliente" autocomplete="off" onsubmit="tratarCadastroCliente(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nome Completo</label>
-          <input type="text" id="cad-nome" required placeholder="Seu nome" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="text" id="cad-nome" required autocomplete="off" placeholder="Seu nome" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp (Apenas números com DDD)</label>
-          <input type="text" id="cad-whatsapp" required maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="text" id="cad-whatsapp" required autocomplete="off" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Crie uma Senha (Mín. 6 caracteres)</label>
-          <input type="password" id="cad-senha" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="password" id="cad-senha" required autocomplete="new-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Cadastrar Conta</button>
       </form>
 
       <!-- Formulário de Login -->
-      <form id="form-login-cliente" onsubmit="tratarLoginCliente(event)" class="space-y-4 hidden">
+      <form id="form-login-cliente" autocomplete="off" onsubmit="tratarLoginCliente(event)" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">WhatsApp (Apenas números)</label>
-          <input type="text" id="login-whatsapp" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="text" id="login-whatsapp" autocomplete="off" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Senha</label>
-          <input type="password" id="login-senha" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="password" id="login-senha" autocomplete="new-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Entrar no Portal</button>
         <div class="text-right">
@@ -140,14 +140,14 @@
       </form>
 
       <!-- Formulário de Redefinir Senha -->
-      <form id="form-redefinir-senha" onsubmit="tratarRedefinirSenha(event)" class="space-y-4 hidden">
+      <form id="form-redefinir-senha" autocomplete="off" onsubmit="tratarRedefinirSenha(event)" class="space-y-4 hidden">
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Seu WhatsApp (Apenas números)</label>
-          <input type="text" id="red-whatsapp" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="text" id="red-whatsapp" autocomplete="off" maxlength="11" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 11)" placeholder="22999999999" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Nova Senha (Mín. 6 caracteres)</label>
-          <input type="password" id="red-novasenha" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
+          <input type="password" id="red-novasenha" autocomplete="new-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-brand-500 focus:bg-white outline-none text-sm transition">
         </div>
         <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Redefinir Senha</button>
       </form>
@@ -231,10 +231,10 @@
         </button>
         <span class="text-sm font-semibold text-slate-900">Painel Restrito</span>
       </div>
-      <form onsubmit="tratarLoginAdmin(event)" class="space-y-4">
+      <form autocomplete="off" onsubmit="tratarLoginAdmin(event)" class="space-y-4">
         <div>
           <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Senha Mestre</label>
-          <input type="password" id="admin-senha" required placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 focus:bg-white outline-none text-sm transition">
+          <input type="password" id="admin-senha" required autocomplete="new-password" placeholder="••••••••" class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 focus:bg-white outline-none text-sm transition">
         </div>
         <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-sm">Acessar Painel</button>
       </form>
@@ -311,7 +311,6 @@
 
   <!-- SCRIPT DE INTEGRAÇÃO SUPABASE -->
   <script>
-    // Configuração com a sua Chave Real do Supabase
     const SUPABASE_URL = 'https://oqdjolcdmjzucwknvivg.supabase.co';
     const SUPABASE_ANON_KEY = 'sb_publishable_D9D3I68g4lwcWipW0OLPJQ_ZSI9Hyn9';
 
@@ -327,7 +326,6 @@
     let estadoAuth = 'cadastro';
     const SENHA_ADMIN_HASH = "24c21966270df333eb7e31b67f10b7f6c38ee96f4094a9a016b8014e7a633190";
 
-    // --- SISTEMA DE NOTIFICAÇÕES PROFISSIONAL (TOAST) ---
     function mostrarMensagem(mensagem, tipo = 'sucesso') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -377,6 +375,11 @@
     }
 
     function alternarModoAuth(modo) {
+      // Limpa os formulários ao alternar para evitar dados antigos visíveis
+      document.getElementById('form-cadastro-cliente').reset();
+      document.getElementById('form-login-cliente').reset();
+      document.getElementById('form-redefinir-senha').reset();
+
       const formLogin = document.getElementById('form-login-cliente');
       const formCad = document.getElementById('form-cadastro-cliente');
       const formRed = document.getElementById('form-redefinir-senha');
@@ -433,7 +436,6 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // --- CLIENTE: CADASTRO E LOGIN ---
     async function tratarCadastroCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('cad-nome').value.trim();
@@ -635,7 +637,6 @@
       }
     }
 
-    // --- ADMIN: LOGIN E PAINEL ---
     async function tratarLoginAdmin(e) {
       e.preventDefault();
       const senhaPura = document.getElementById('admin-senha').value;
