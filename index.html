@@ -328,6 +328,18 @@
     let usuarioLogado = null;
     let estadoAuth = 'cadastro';
 
+    // Função para formatar o telefone (ex: 22999999999 vira (22) 99999-9999)
+    function formatarWhatsApp(tel) {
+      if (!tel) return '';
+      const apenasNums = tel.replace(/\D/g, '');
+      if (apenasNums.length === 11) {
+        return `(${apenasNums.slice(0, 2)}) ${apenasNums.slice(2, 7)}-${apenasNums.slice(7)}`;
+      } else if (apenasNums.length === 10) {
+        return `(${apenasNums.slice(0, 2)}) ${apenasNums.slice(2, 6)}-${apenasNums.slice(6)}`;
+      }
+      return tel;
+    }
+
     function mostrarMensagem(mensagem, tipo = 'sucesso') {
       const container = document.getElementById('toast-container');
       const toast = document.createElement('div');
@@ -666,7 +678,6 @@
       const senhaPura = document.getElementById('admin-senha').value;
       
       if (senhaPura === 'chai2026') {
-        // Limpa a senha do campo imediatamente após o login
         document.getElementById('admin-senha').value = '';
         
         document.getElementById('user-welcome').innerText = 'Dr. Filipe';
@@ -691,12 +702,13 @@
       tbody.innerHTML = '';
       if (agendamentos && agendamentos.length > 0) {
         agendamentos.forEach(ag => {
+          const telFormatado = formatarWhatsApp(ag.whatsapp);
           tbody.innerHTML += `
             <tr class="hover:bg-slate-50 transition">
               <td class="py-3 px-3 font-medium text-slate-900">${ag.data_consulta} às ${ag.horario}</td>
               <td class="py-3 px-3 text-slate-700">${ag.nome}</td>
               <td class="py-3 px-3 text-slate-600 text-xs">${ag.servico}</td>
-              <td class="py-3 px-3 text-slate-600">${ag.whatsapp}</td>
+              <td class="py-3 px-3 text-slate-600">${telFormatado}</td>
             </tr>
           `;
         });
@@ -709,7 +721,8 @@
       select.innerHTML = '';
       if (pacientes && pacientes.length > 0) {
         pacientes.forEach(p => {
-          select.innerHTML += `<option value="${p.whatsapp}">${p.nome} (${p.whatsapp})</option>`;
+          const telFormatado = formatarWhatsApp(p.whatsapp);
+          select.innerHTML += `<option value="${p.whatsapp}">${p.nome} (${telFormatado})</option>`;
         });
       } else {
         select.innerHTML = `<option value="">Nenhum paciente cadastrado</option>`;
