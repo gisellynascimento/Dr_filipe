@@ -25,7 +25,10 @@
     }
   </script>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between">
+<body class="bg-slate-50 text-slate-800 font-sans min-h-screen flex flex-col justify-between relative">
+
+  <!-- SISTEMA DE NOTIFICAÇÕES PROFISSIONAL (TOAST) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-2 pointer-events-none"></div>
 
   <!-- HEADER -->
   <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-sm">
@@ -324,6 +327,35 @@
     let estadoAuth = 'cadastro';
     const SENHA_ADMIN_HASH = "24c21966270df333eb7e31b67f10b7f6c38ee96f4094a9a016b8014e7a633190";
 
+    // --- SISTEMA DE NOTIFICAÇÕES PROFISSIONAL (TOAST) ---
+    function mostrarMensagem(mensagem, tipo = 'sucesso') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const corFundo = tipo === 'erro' ? 'bg-rose-600 text-white' : 'bg-slate-900 text-white';
+      const icone = tipo === 'erro' ? 'alert-circle' : 'check-circle-2';
+
+      toast.className = `${corFundo} px-4 py-3 rounded-xl shadow-lg flex items-center space-x-3 text-sm font-medium transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto`;
+      toast.innerHTML = `
+        <i data-lucide="${icone}" class="w-5 h-5 shrink-0"></i>
+        <span>${mensagem}</span>
+      `;
+
+      container.appendChild(toast);
+      lucide.createIcons();
+
+      // Animar entrada
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+
+      // Remover após 3.5 segundos
+      setTimeout(() => {
+        toast.classList.add('translate-y-2', 'opacity-0');
+        setTimeout(() => toast.remove(), 300);
+      }, 3500);
+    }
+
     function mostrarTela(idTela) {
       ['view-inicio', 'view-login-cliente', 'view-painel-cliente', 'view-login-admin', 'view-painel-admin'].forEach(id => {
         document.getElementById(id).classList.add('hidden');
@@ -403,23 +435,21 @@
       return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
     }
 
-    // --- CLIENTE: CADASTRO E LOGIN (Com Validações) ---
+    // --- CLIENTE: CADASTRO E LOGIN ---
     async function tratarCadastroCliente(e) {
       e.preventDefault();
       const nome = document.getElementById('cad-nome').value.trim();
       const whatsapp = document.getElementById('cad-whatsapp').value.trim();
       const senhaPura = document.getElementById('cad-senha').value;
       
-      // Validação de tamanho mínimo da senha
       if (senhaPura.length < 6) {
-        alert('A senha precisa ter pelo menos 6 caracteres.');
+        mostrarMensagem('A senha precisa ter pelo menos 6 caracteres.', 'erro');
         return;
       }
 
-      // Validação de tamanho do WhatsApp
       const apenasNumeros = whatsapp.replace(/\D/g, '');
       if (apenasNumeros.length < 10 || apenasNumeros.length > 11) {
-        alert('Por favor, digite um número de WhatsApp válido com DDD (ex: 22999999999).');
+        mostrarMensagem('Digite um WhatsApp válido com DDD (ex: 22999999999).', 'erro');
         return;
       }
 
@@ -429,7 +459,7 @@
       const { data: existente } = await supabaseClient.from('clientes').select('*').eq('whatsapp', whatsapp).single();
       if (existente) {
         mostrarLoader(false);
-        alert('Este WhatsApp já está cadastrado. Vá em "Fazer Login".');
+        mostrarMensagem('Este WhatsApp já está cadastrado. Faça login.', 'erro');
         return;
       }
 
@@ -437,16 +467,16 @@
       mostrarLoader(false);
 
       if (error) {
-        alert('Erro ao cadastrar. Tente novamente.');
+        mostrarMensagem('Erro ao cadastrar. Tente novamente.', 'erro');
       } else {
-        alert('Cadastro realizado com sucesso! Faça login.');
+        mostrarMensagem('Cadastro realizado com sucesso!');
         alternarModoAuth('login');
       }
     }
 
     async function tratarLoginCliente(e) {
       e.preventDefault();
-      const whatsapp = document.getElementById('login-whatsapp').value;
+      const whatsapp = document.getElementById('login-whatsapp').value.trim();
       const senhaPura = document.getElementById('login-senha').value;
 
       mostrarLoader(true);
@@ -456,7 +486,7 @@
       mostrarLoader(false);
 
       if (error || !cliente) {
-        alert('WhatsApp não encontrado. Faça seu cadastro primeiro.');
+        mostrarMensagem('WhatsApp não encontrado. Faça seu cadastro.', 'erro');
         return;
       }
 
@@ -467,18 +497,19 @@
         document.getElementById('header-actions').classList.remove('hidden');
         carregarDadosPainelCliente();
         mostrarTela('view-painel-cliente');
+        mostrarMensagem(`Bem-vindo(a), ${cliente.nome}!`);
       } else {
-        alert('Senha incorreta. Verifique os dados informados.');
+        mostrarMensagem('Senha incorreta. Verifique os dados.', 'erro');
       }
     }
 
     async function tratarRedefinirSenha(e) {
       e.preventDefault();
-      const whatsapp = document.getElementById('red-whatsapp').value;
+      const whatsapp = document.getElementById('red-whatsapp').value.trim();
       const novaSenhaPura = document.getElementById('red-novasenha').value;
 
       if (novaSenhaPura.length < 6) {
-        alert('A nova senha precisa ter pelo menos 6 caracteres.');
+        mostrarMensagem('A nova senha precisa ter pelo menos 6 caracteres.', 'erro');
         return;
       }
 
@@ -488,7 +519,7 @@
       const { data: cliente } = await supabaseClient.from('clientes').select('*').eq('whatsapp', whatsapp).single();
       if (!cliente) {
         mostrarLoader(false);
-        alert('Este WhatsApp não possui cadastro no sistema.');
+        mostrarMensagem('Este WhatsApp não possui cadastro.', 'erro');
         return;
       }
 
@@ -496,9 +527,9 @@
       mostrarLoader(false);
 
       if (error) {
-        alert('Erro ao redefinir senha.');
+        mostrarMensagem('Erro ao redefinir senha.', 'erro');
       } else {
-        alert('Senha redefinida com sucesso! Faça login com a nova senha.');
+        mostrarMensagem('Senha redefinida com sucesso!');
         alternarModoAuth('login');
       }
     }
@@ -561,9 +592,9 @@
       mostrarLoader(false);
 
       if (error) {
-        alert('Erro ao realizar agendamento.');
+        mostrarMensagem('Erro ao realizar agendamento.', 'erro');
       } else {
-        alert('Consulta agendada com sucesso!');
+        mostrarMensagem('Consulta agendada com sucesso!');
         document.getElementById('form-agendamento').reset();
       }
     }
@@ -610,20 +641,19 @@
         document.getElementById('header-actions').classList.remove('hidden');
         carregarDadosAdmin();
         mostrarTela('view-painel-admin');
+        mostrarMensagem('Painel administrativo acessado com sucesso!');
       } else {
-        alert('Senha mestre incorreta!');
+        mostrarMensagem('Senha mestre incorreta!', 'erro');
       }
     }
 
     async function carregarDadosAdmin() {
       mostrarLoader(true);
       
-      // Config
       const { data: configData } = await supabaseClient.from('configuracoes').select('*').eq('chave', 'liberarAgendamentoCliente').single();
       const liberar = configData ? (configData.valor === 'true' || configData.valor === true) : false;
       document.getElementById('toggle-liberar-agendamento').checked = liberar;
 
-      // Agendamentos
       const { data: agendamentos } = await supabaseClient.from('agendamentos').select('*').order('id', { ascending: false });
       const tbody = document.getElementById('tabela-agendamentos-admin');
       tbody.innerHTML = '';
@@ -642,7 +672,6 @@
         tbody.innerHTML = `<tr><td colspan="4" class="py-6 text-center text-slate-400">Nenhum agendamento encontrado.</td></tr>`;
       }
 
-      // Pacientes
       const { data: pacientes } = await supabaseClient.from('clientes').select('*').order('nome', { ascending: true });
       const select = document.getElementById('admin-paciente-whatsapp');
       select.innerHTML = '';
@@ -660,6 +689,7 @@
     async function alterarConfigAgendamento(checkbox) {
       const liberar = String(checkbox.checked);
       await supabaseClient.from('configuracoes').update({ valor: liberar }).eq('chave', 'liberarAgendamentoCliente');
+      mostrarMensagem('Configuração de agendamento atualizada!');
     }
 
     async function salvarProntuarioAdmin(e) {
@@ -675,9 +705,9 @@
       mostrarLoader(false);
 
       if (error) {
-        alert('Erro ao salvar prontuário.');
+        mostrarMensagem('Erro ao salvar prontuário.', 'erro');
       } else {
-        alert('Prontuário salvo com sucesso!');
+        mostrarMensagem('Prontuário salvo com sucesso!');
         document.getElementById('admin-anotacao').value = '';
         carregarDadosAdmin();
       }
@@ -685,6 +715,7 @@
 
     function fazerLogout() {
       voltarInicio();
+      mostrarMensagem('Sessão encerrada com sucesso.');
     }
   </script>
 </body>
