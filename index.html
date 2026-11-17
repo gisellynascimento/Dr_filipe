@@ -324,8 +324,6 @@
 
     let usuarioLogado = null;
     let estadoAuth = 'cadastro';
-    // Nova senha mestre configurada para: chai2026
-    const SENHA_ADMIN_HASH = "b9795d666d6d87e07675765faae4eefdd7df1fa291b92015a9ff73a876a445e9";
 
     function mostrarMensagem(mensagem, tipo = 'sucesso') {
       const container = document.getElementById('toast-container');
@@ -637,14 +635,12 @@
       }
     }
 
+    // --- ADMIN: LOGIN E PAINEL (Senha Direta: chai2026) ---
     async function tratarLoginAdmin(e) {
       e.preventDefault();
       const senhaPura = document.getElementById('admin-senha').value;
-      mostrarLoader(true);
-      const senhaHash = await calcularHash(senhaPura);
-      mostrarLoader(false);
-
-      if (senhaHash === SENHA_ADMIN_HASH) {
+      
+      if (senhaPura === 'chai2026') {
         document.getElementById('user-welcome').innerText = 'Dr. Filipe';
         document.getElementById('header-actions').classList.remove('hidden');
         carregarDadosAdmin();
