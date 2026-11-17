@@ -278,7 +278,7 @@
           </div>
         </div>
 
-        <!-- Coluna Direita: Prontuários / Novo Registro -->
+        <!-- Coluna Direita: Prontuários / Novo Registro com Upload -->
         <div class="space-y-4">
           <h3 class="text-lg font-bold text-slate-900 flex items-center space-x-2">
             <i data-lucide="folder-plus" class="w-5 h-5 text-slate-700"></i>
@@ -292,9 +292,13 @@
               </div>
               <div>
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Anotações / Evolução</label>
-                <textarea id="admin-anotacao" rows="5" required placeholder="Descreva a avaliação quiroprática, ajustes realizados..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none text-sm resize-none"></textarea>
+                <textarea id="admin-anotacao" rows="4" required placeholder="Descreva a avaliação quiroprática, ajustes realizados..." class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-800 outline-none text-sm resize-none"></textarea>
               </div>
-              <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-sm">Salvar Prontuário</button>
+              <div>
+                <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1">Anexar Documento / Exame (Opcional)</label>
+                <input type="file" id="admin-arquivo" class="w-full text-xs text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-slate-100 file:text-slate-700 hover:file:bg-slate-200 transition cursor-pointer">
+              </div>
+              <button type="submit" class="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-semibold rounded-xl shadow-md transition text-sm">Salvar Prontuário e Anexo</button>
             </form>
           </div>
         </div>
@@ -318,11 +322,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       verificarConfiguracaoGlobal();
-      abrirTelaAuth('cadastro'); // Inicia na tela de cadastro limpa
+      abrirTelaAuth('cadastro');
     });
 
     let usuarioLogado = null;
-    let estadoAuth = 'cadastro'; // 'cadastro' ou 'login'
+    let estadoAuth = 'cadastro';
 
     function mostrarMensagem(mensagem, tipo = 'sucesso') {
       const container = document.getElementById('toast-container');
@@ -372,7 +376,6 @@
       }
     }
 
-    // --- CONTROLE UNIFICADO DE ALTERNÂNCIA (CADASTRO / LOGIN) ---
     function abrirTelaAuth(modo) {
       estadoAuth = modo;
       document.getElementById('form-cadastro-cliente').reset();
@@ -620,6 +623,23 @@
       if (registros && registros.length > 0) {
         registros.forEach(item => {
           const dataFormatada = new Date(item.data_hora).toLocaleDateString('pt-BR');
+          
+          let botaoAnexo = '';
+          if (item.url_arquivo) {
+            botaoAnexo = `
+              <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between">
+                <span class="text-xs text-slate-500 font-medium flex items-center space-x-1">
+                  <i data-lucide="paperclip" class="w-4 h-4 text-brand-600"></i>
+                  <span>Documento / Exame Anexado</span>
+                </span>
+                <a href="${item.url_arquivo}" target="_blank" class="px-3 py-1.5 bg-brand-50 hover:bg-brand-100 text-brand-700 rounded-lg text-xs font-semibold transition flex items-center space-x-1">
+                  <i data-lucide="download" class="w-3.5 h-3.5"></i>
+                  <span>Ver Arquivo</span>
+                </a>
+              </div>
+            `;
+          }
+
           container.innerHTML += `
             <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm space-y-2">
               <div class="flex justify-between items-center text-xs text-slate-400 font-semibold">
@@ -627,9 +647,11 @@
                 <span class="bg-brand-50 text-brand-700 px-2.5 py-0.5 rounded-full">Atendimento Realizado</span>
               </div>
               <p class="text-sm text-slate-700 whitespace-pre-line">${item.anotacoes_dr}</p>
+              ${botaoAnexo}
             </div>
           `;
         });
+        lucide.createIcons();
       } else {
         container.innerHTML = `
           <div class="bg-white border border-slate-200 rounded-2xl p-8 text-center text-slate-400 text-sm">
@@ -703,19 +725,47 @@
       e.preventDefault();
       const whatsappPaciente = document.getElementById('admin-paciente-whatsapp').value;
       const anotacoesDr = document.getElementById('admin-anotacao').value;
+      const inputArquivo = document.getElementById('admin-arquivo');
 
       mostrarLoader(true);
+
+      let urlArquivoFinal = null;
+
+      if (inputArquivo.files.length > 0) {
+        const arquivo = inputArquivo.files[0];
+        const nomeUnico = `${Date.now()}_${arquivo.name}`;
+
+        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+          .from('prontuarios-anexos')
+          .upload(nomeUnico, arquivo);
+
+        if (uploadError) {
+          mostrarLoader(false);
+          mostrarMensagem('Erro ao enviar o arquivo anexado.', 'erro');
+          return;
+        }
+
+        const { data: publicUrlData } = supabaseClient.storage
+          .from('prontuarios-anexos')
+          .getPublicUrl(nomeUnico);
+
+        urlArquivoFinal = publicUrlData.publicUrl;
+      }
+
       const { error } = await supabaseClient.from('prontuarios').insert([{
         whatsapp_paciente: whatsappPaciente,
-        anotacoes_dr: anotacoesDr
+        anotacoes_dr: anotacoesDr,
+        url_arquivo: urlArquivoFinal
       }]);
+
       mostrarLoader(false);
 
       if (error) {
         mostrarMensagem('Erro ao salvar prontuário.', 'erro');
       } else {
-        mostrarMensagem('Prontuário salvo com sucesso!');
+        mostrarMensagem('Prontuário e anexo salvos com sucesso!');
         document.getElementById('admin-anotacao').value = '';
+        inputArquivo.value = '';
         carregarDadosAdmin();
       }
     }
