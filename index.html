@@ -152,10 +152,9 @@
         <button type="submit" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl shadow-md transition text-sm">Redefinir Senha</button>
       </form>
 
-      <!-- Botões de Alternância -->
-      <div class="text-center pt-2 border-t border-slate-100 space-y-2">
-        <button type="button" id="btn-toggle-cadastro" class="text-xs text-brand-600 hover:underline font-medium hidden">Já tem cadastro? Clique aqui para entrar</button>
-        <button type="button" id="btn-toggle-login" class="text-xs text-brand-600 hover:underline font-medium block mx-auto">Já tem cadastro? Clique aqui para entrar</button>
+      <!-- Botão Único de Alternância Dinâmica -->
+      <div class="text-center pt-2 border-t border-slate-100">
+        <button type="button" id="btn-toggle-auth" onclick="alternarModoAuth()" class="text-xs text-brand-600 hover:underline font-medium">Já tem cadastro? Clique aqui para entrar</button>
       </div>
     </div>
 
@@ -319,11 +318,11 @@
     document.addEventListener('DOMContentLoaded', () => {
       lucide.createIcons();
       verificarConfiguracaoGlobal();
-      alternarModoAuth('cadastro');
+      abrirTelaAuth('cadastro'); // Inicia na tela de cadastro limpa
     });
 
     let usuarioLogado = null;
-    let estadoAuth = 'cadastro';
+    let estadoAuth = 'cadastro'; // 'cadastro' ou 'login'
 
     function mostrarMensagem(mensagem, tipo = 'sucesso') {
       const container = document.getElementById('toast-container');
@@ -373,7 +372,9 @@
       }
     }
 
-    function alternarModoAuth(modo) {
+    // --- CONTROLE UNIFICADO DE ALTERNÂNCIA (CADASTRO / LOGIN) ---
+    function abrirTelaAuth(modo) {
+      estadoAuth = modo;
       document.getElementById('form-cadastro-cliente').reset();
       document.getElementById('form-login-cliente').reset();
       document.getElementById('form-redefinir-senha').reset();
@@ -382,27 +383,28 @@
       const formCad = document.getElementById('form-cadastro-cliente');
       const formRed = document.getElementById('form-redefinir-senha');
       const title = document.getElementById('auth-mode-title');
-      const btnLogin = document.getElementById('btn-toggle-login');
-      const btnCadastro = document.getElementById('btn-toggle-cadastro');
+      const btnToggle = document.getElementById('btn-toggle-auth');
 
       formLogin.classList.add('hidden');
       formCad.classList.add('hidden');
       formRed.classList.add('hidden');
-      btnLogin.classList.add('hidden');
-      btnCadastro.classList.add('hidden');
 
       if (modo === 'cadastro') {
         formCad.classList.remove('hidden');
-        btnLogin.classList.remove('hidden');
         title.innerText = 'Criar Nova Conta';
-        btnLogin.innerText = 'Já tem cadastro? Clique aqui para entrar';
-        estadoAuth = 'cadastro';
+        btnToggle.innerText = 'Já tem cadastro? Clique aqui para entrar';
       } else if (modo === 'login') {
         formLogin.classList.remove('hidden');
-        btnCadastro.classList.remove('hidden');
         title.innerText = 'Entrar na Conta';
-        btnCadastro.innerText = 'Não tem cadastro? Clique aqui para criar';
-        estadoAuth = 'login';
+        btnToggle.innerText = 'Não tem cadastro? Clique aqui para criar';
+      }
+    }
+
+    function alternarModoAuth() {
+      if (estadoAuth === 'cadastro') {
+        abrirTelaAuth('login');
+      } else {
+        abrirTelaAuth('cadastro');
       }
     }
 
@@ -410,22 +412,9 @@
       document.getElementById('form-login-cliente').classList.add('hidden');
       document.getElementById('form-redefinir-senha').classList.remove('hidden');
       document.getElementById('auth-mode-title').innerText = 'Redefinir Senha';
-      document.getElementById('btn-toggle-login').classList.remove('hidden');
-      document.getElementById('btn-toggle-login').innerText = 'Lembrou a senha? Clique aqui para entrar';
-      estadoAuth = 'redefinir';
+      document.getElementById('btn-toggle-auth').innerText = 'Lembrou a senha? Clique aqui para entrar';
+      estadoAuth = 'login';
     }
-
-    document.getElementById('btn-toggle-login').addEventListener('click', () => {
-      if (estadoAuth === 'login' || estadoAuth === 'redefinir') {
-        alternarModoAuth('cadastro');
-      } else {
-        alternarModoAuth('login');
-      }
-    });
-
-    document.getElementById('btn-toggle-cadastro').addEventListener('click', () => {
-      alternarModoAuth('login');
-    });
 
     async function calcularHash(texto) {
       const msgUint8 = new TextEncoder().encode(texto);
@@ -467,7 +456,7 @@
         mostrarMensagem('Erro ao cadastrar. Tente novamente.', 'erro');
       } else {
         mostrarMensagem('Cadastro realizado com sucesso!');
-        alternarModoAuth('login');
+        abrirTelaAuth('login');
       }
     }
 
@@ -537,7 +526,7 @@
         mostrarMensagem('Erro ao redefinir senha.', 'erro');
       } else {
         mostrarMensagem('Senha redefinida com sucesso!');
-        alternarModoAuth('login');
+        abrirTelaAuth('login');
       }
     }
 
@@ -589,6 +578,20 @@
       const horario = document.getElementById('ag-horario').value;
 
       mostrarLoader(true);
+
+      const { data: conflito } = await supabaseClient
+        .from('agendamentos')
+        .select('*')
+        .eq('data_consulta', dataConsulta)
+        .eq('horario', horario)
+        .single();
+
+      if (conflito) {
+        mostrarLoader(false);
+        mostrarMensagem('Este horário já foi agendado por outro paciente. Escolha outro.', 'erro');
+        return;
+      }
+
       const { error } = await supabaseClient.from('agendamentos').insert([{
         nome: usuarioLogado.nome,
         whatsapp: usuarioLogado.whatsapp,
@@ -596,6 +599,7 @@
         data_consulta: dataConsulta,
         horario
       }]);
+      
       mostrarLoader(false);
 
       if (error) {
@@ -635,7 +639,6 @@
       }
     }
 
-    // --- ADMIN: LOGIN E PAINEL (Senha Direta: chai2026) ---
     async function tratarLoginAdmin(e) {
       e.preventDefault();
       const senhaPura = document.getElementById('admin-senha').value;
